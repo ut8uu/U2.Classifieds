@@ -17,15 +17,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace U2.Classifieds.Core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-public sealed class BranchDto
+namespace U2.Classifieds.Core.Impl
 {
-    public Guid Id { get; set; }
-    public Guid ParentId { get; set; }
-    public int OriginalId { get; set; }
-    public string Title { get; set; }
-    public string Url { get; set; }
-    public UrlLoadState LoadState { get; set; }
-    public UrlLoadStatusCode LoadStatusCode { get; set; }
+    internal class IProcessor
+    {
+        Task Run(CancellationToken token);
+    }
 }

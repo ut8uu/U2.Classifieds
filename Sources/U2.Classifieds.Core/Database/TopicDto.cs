@@ -1,5 +1,5 @@
 ﻿/* 
- * This file is part of the U2.SharpTracker distribution
+ * This file is part of the U2.Classifieds distribution
  * (https://github.com/ut8uu/U2.Classifieds).
  * 
  * Copyright (c) 2022 Sergey Usmanov.
