@@ -35,11 +35,12 @@ public static class FileCache
     {
         var cachePath = CoreSettings.Default.CacheDirectory;
         var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(url));
-        var hashString = Encoding.UTF8.GetString(hashBytes);
+
+        var hashString = BitConverter.ToString(hashBytes).Replace("-", "");
         var p1 = hashString.Substring(0, 2);
         var p2 = hashString.Substring(2, 2);
-        var p3 = hashString.Substring(3, 2);
-        var p4 = hashString.Substring(4, 2);
+        var p3 = hashString.Substring(4, 2);
+        var p4 = hashString.Substring(6, 2);
 
         return Path.Combine(cachePath, p1, p2, p3, p4, $"{hashString}.html");
     }

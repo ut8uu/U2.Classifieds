@@ -21,22 +21,20 @@ namespace U2.Classifieds.Core;
 
 public sealed class TopicDto
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public Guid BranchId { get; set; }
-    public int OriginalId { get; set; }
+    public string OriginalId { get; set; }
     public string Url { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
-    public string RawContent { get; set; }
-    public string Hash { get; set; }
-    public UrlLoadState UrlLoadState { get; set; }
+    public int Price { get; set; }
+    public Guid UserId { get; set; }
+    public List<string> Images { get; set; }
+    public SellerType SellerType { get; set; }
+    public ItemCondition ItemCondition { get; set; }
+    public List<string> Phones { get; set; }
+    public List<string> DeliveryInfo { get; set; }
+    public UrlLoadState LoadState { get; set; }
     public UrlLoadStatusCode LoadStatusCode { get; set; }
-    public ParserStatusCode ParseStatusCode { get; set; }
-    public string ProcessingMessage { get; set; }
-    public long Size { get; set; }
-    public int Seeders { get; set; }
-    public int Leechers { get; set; }
-    public int DownloadNumber { get; set; }
-    public int Replies { get; set; }
 }
 

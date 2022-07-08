@@ -21,11 +21,12 @@ namespace U2.Classifieds.Core;
 
 public sealed class BranchDto
 {
-    public Guid Id { get; set; }
-    public Guid ParentId { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid ParentId { get; set; } = Guid.NewGuid();
     public int OriginalId { get; set; }
     public string Title { get; set; }
     public string Url { get; set; }
-    public UrlLoadState LoadState { get; set; }
-    public UrlLoadStatusCode LoadStatusCode { get; set; }
+    public UrlLoadState LoadState { get; set; } = UrlLoadState.Unknown;
+    public UrlLoadStatusCode LoadStatusCode { get; set; } = UrlLoadStatusCode.Unknown;
+    public DateTime NextLoadTime { get; set; } = DateTime.MinValue;
 }

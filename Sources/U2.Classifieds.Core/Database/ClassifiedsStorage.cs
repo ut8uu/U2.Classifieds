@@ -19,6 +19,7 @@
 
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Newtonsoft.Json.Linq;
 
 namespace U2.Classifieds.Core;
 
@@ -57,7 +58,7 @@ public sealed class ClassifiedsStorage : IStorage
 
     public Task UpdateBranchAsync(BranchDto branch, CancellationToken cancellationToken)
     {
-        return _branchesCollection.ReplaceOneAsync(p => p.Id == branch.Id, branch, new ReplaceOptions { }, cancellationToken);
+        return _branchesCollection.ReplaceOneAsync(p => p.Url == branch.Url, branch, new ReplaceOptions { }, cancellationToken);
     }
 
     public Task DeleteBranchAsync(Guid id, CancellationToken cancellationToken)
@@ -102,7 +103,7 @@ public sealed class ClassifiedsStorage : IStorage
 
     public Task UpdateTopicAsync(TopicDto Topic, CancellationToken cancellationToken)
     {
-        return _topicsCollection.ReplaceOneAsync(x => x.Id == Topic.Id, Topic, new ReplaceOptions { }, cancellationToken);
+        return _topicsCollection.ReplaceOneAsync(x => x.Url == Topic.Url, Topic, new ReplaceOptions { }, cancellationToken);
     }
 
     public Task DeleteTopicAsync(Guid id, CancellationToken cancellationToken)
@@ -134,31 +135,37 @@ public sealed class ClassifiedsStorage : IStorage
         }
     }
 
-    public Task<bool> HasTopic(string Topic, CancellationToken cancellationToken)
+    public Task<bool> HasTopicWithUrlAsync(string url, CancellationToken cancellationToken)
     {
-        var foundTopic = _topicsCollection.Find(x => x.Url == Topic)
+        var foundTopic = _topicsCollection.Find(x => x.Url == url)
             .FirstOrDefault(cancellationToken);
         return Task.FromResult(foundTopic != null);
     }
 
-    public Task<bool> HasTopic(int originalId, CancellationToken cancellationToken)
+    public Task<bool> HasTopicWithIdAsync(string originalId, CancellationToken cancellationToken)
     {
         var foundTopic = _topicsCollection.Find(x => x.OriginalId == originalId)
             .FirstOrDefault(cancellationToken);
         return Task.FromResult(foundTopic != null);
     }
 
-    public Task<bool> HasBranch(string Topic, CancellationToken cancellationToken)
+    public Task<bool> HasBranchAsync(string url, CancellationToken cancellationToken)
     {
-        var branchesCount = _branchesCollection.Find(x => x.Url == Topic)
+        var branchesCount = _branchesCollection.Find(x => x.Url == url)
             .CountDocumentsAsync(cancellationToken);
         return Task.FromResult(branchesCount.Result > 0);
     }
 
-    public Task<bool> HasBranch(int originalId, CancellationToken cancellationToken)
+    public Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken)
     {
         var hasBranch = _branchesCollection.Find(x => x.OriginalId == originalId)
             .Any(cancellationToken);
         return Task.FromResult(hasBranch);
+    }
+
+    public async Task<BranchDto> TryGetBranchAsync(FilterDefinition<BranchDto> filter, CancellationToken cancellationToken)
+    {
+        using var cursor = await _branchesCollection.FindAsync(filter, options: null, cancellationToken);
+        return cursor.FirstOrDefault();
     }
 }

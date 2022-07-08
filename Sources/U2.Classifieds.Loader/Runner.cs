@@ -17,16 +17,31 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using U2.Classifieds.Core;
+using U2.Classifieds.Core.Database;
 
-namespace U2.Classifieds.Core;
+namespace U2.Classifieds.Loader;
 
-public interface IProcessor
+internal sealed class Runner
 {
-    Task RunAsync(CancellationToken token);
+    private readonly IProcessor _processor = new OlxProcessor();
+
+    public Runner()
+    {
+        
+    }
+
+    public async Task RunAsync(CancellationToken token)
+    {
+        await _processor.RunAsync(token);
+    }
 
 }

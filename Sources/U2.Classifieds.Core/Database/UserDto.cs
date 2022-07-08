@@ -16,17 +16,20 @@
  * You should have received a copy of the GNU General Public License 
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace U2.Classifieds.Core;
-
-public interface IProcessor
+namespace U2.Classifieds.Core.Database
 {
-    Task RunAsync(CancellationToken token);
-
+    internal sealed class UserDto
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Url { get; set; }
+        public DateTime RegistrationTimestamp { get; set; }
+        public List<string> Phones { get; set; }
+    }
 }

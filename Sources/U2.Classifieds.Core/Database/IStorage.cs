@@ -43,9 +43,9 @@ public interface IStorage
 
     Task<TopicDto> GetTopicAsync(BsonDocument filter, CancellationToken token);
 
-    Task<bool> HasTopic(string Topic, CancellationToken cancellationToken);
-    Task<bool> HasTopic(int originalId, CancellationToken cancellationToken);
-    Task<bool> HasBranch(string branch, CancellationToken cancellationToken);
-    Task<bool> HasBranch(int originalId, CancellationToken cancellationToken);
+    Task<bool> HasTopicWithUrlAsync(string url, CancellationToken cancellationToken);
+    Task<bool> HasTopicWithIdAsync(string originalId, CancellationToken cancellationToken);
+    Task<bool> HasBranchAsync(string branch, CancellationToken cancellationToken);
+    Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken);
 
 }
