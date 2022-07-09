@@ -172,7 +172,6 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     protected override async Task LoadBranchPageAsync()
     {
-        return;
         var branch = await Service.GetWaitingBranchAsync(Token);
         if (branch == null)
         {
@@ -304,7 +303,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
             return;
         }
 
-        var classifiedsPage = await ParsePageAsync(content);
+        //var classifiedsPage = await ParsePageAsync(content);
         //await StoreTopicsAsync(Guid.Empty, classifiedsPage.Topics, Token);
 
         topic.LoadState = UrlLoadState.Loaded;
@@ -314,8 +313,10 @@ public class OlxProcessor : ProcessorBase, IProcessor
         var user = new UserDto();
         TopicHelper.ExtractUserInfo(content, user);
 
+        user = await Service.AddOrUpdateUserAsync(user, Token);
+        
+        topic.UserId = user.Id;
         await Service.UpdateTopicAsync(topic, Token);
-        await Service.AddOrUpdateUserAsync(user, Token);
 
         foreach (var topicImage in topic.Images)
         {

@@ -73,7 +73,16 @@ public sealed class ClassifiedsStorage : IStorage
 
     public Task UpdateBranchAsync(BranchDto branch, CancellationToken cancellationToken)
     {
-        return _branchesCollection.ReplaceOneAsync(p => p.Url == branch.Url, branch, new ReplaceOptions { }, cancellationToken);
+        try
+        {
+            return _branchesCollection.ReplaceOneAsync(p => p.Url == branch.Url, branch, new ReplaceOptions { },
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Task.FromException(ex);
+        }
     }
 
     public Task DeleteBranchAsync(Guid id, CancellationToken cancellationToken)
@@ -163,12 +172,28 @@ public sealed class ClassifiedsStorage : IStorage
 
     public Task UpdateTopicByOriginalIdAsync(TopicDto Topic, CancellationToken cancellationToken)
     {
-        return _topicsCollection.ReplaceOneAsync(x => x.OriginalId == Topic.OriginalId, Topic, new ReplaceOptions { }, cancellationToken);
+        try
+        {
+            return _topicsCollection.ReplaceOneAsync(x => x.OriginalId == Topic.OriginalId, Topic, new ReplaceOptions { }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Task.FromException(ex);
+        }
     }
 
     public Task UpdateTopicByIdAsync(TopicDto Topic, CancellationToken cancellationToken)
     {
-        return _topicsCollection.ReplaceOneAsync(x => x.Id == Topic.Id, Topic, new ReplaceOptions { }, cancellationToken);
+        try
+        {
+            return _topicsCollection.ReplaceOneAsync(x => x.Id == Topic.Id, Topic, new ReplaceOptions { }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Task.FromException(ex);
+        }
     }
 
     public Task DeleteTopicAsync(Guid id, CancellationToken cancellationToken)
@@ -236,7 +261,15 @@ public sealed class ClassifiedsStorage : IStorage
 
     public Task UpdateUserAsync(UserDto user, CancellationToken cancellationToken)
     {
-        return _usersCollection.ReplaceOneAsync(x => x.OriginalId == user.OriginalId, user, new ReplaceOptions { }, cancellationToken);
+        try
+        {
+            return _usersCollection.ReplaceOneAsync(x => x.OriginalId == user.OriginalId, user, new ReplaceOptions { }, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Task.FromException(ex);
+        }
     }
 
     #endregion

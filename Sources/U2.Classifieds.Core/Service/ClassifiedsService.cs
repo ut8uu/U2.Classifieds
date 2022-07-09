@@ -135,16 +135,20 @@ public sealed class ClassifiedsService
 
     #region Users
 
-    public async Task AddOrUpdateUserAsync(UserDto user, CancellationToken cancellationToken)
+    public async Task<UserDto> AddOrUpdateUserAsync(UserDto user, CancellationToken cancellationToken)
     {
-        if (await _storage.HasUserAsync(user.OriginalId, cancellationToken))
+        var existingUser = await _storage.TryGetUserAsync(user.OriginalId, cancellationToken);
+        if (existingUser != null)
         {
+            user.Id = existingUser.Id;
             await _storage.UpdateUserAsync(user, cancellationToken);
         }
         else
         {
             await _storage.AddUserAsync(user, cancellationToken);
         }
+
+        return user;
     }
 
     #endregion
