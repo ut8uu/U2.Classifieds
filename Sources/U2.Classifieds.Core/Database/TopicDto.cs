@@ -30,7 +30,7 @@ public sealed class TopicDto
     public int Price { get; set; }
     public string Currency { get; set; }
     public Guid UserId { get; set; }
-    public List<string> Images { get; set; }
+    public List<string> Images { get; set; } = new();
     public SellerType SellerType { get; set; }
     public ItemCondition ItemCondition { get; set; }
     public List<string> Phones { get; set; }

@@ -72,6 +72,30 @@ public static class TopicHelper
 
     public static void ExtractTopicImages(HtmlDocument doc, TopicDto topic)
     {
-        
+        var xPath = "//div[@class='swiper-container']//img";
+        var images = doc.DocumentNode.SelectNodes(xPath);
+        if (images == null)
+        {
+            Console.WriteLine($"Cannot find images in {topic.Url}");
+            topic.ParserStatusCode = ParserStatusCode.Fail;
+            return;
+        }
+
+        foreach (var image in images)
+        {
+            var src = image.Attributes["src"];
+            if (src != null)
+            {
+                topic.Images.Add(src.Value.Trim());
+                continue;
+            }
+
+            src = image.Attributes["data-src"];
+            if (src != null)
+            {
+                topic.Images.Add(src.Value.Trim());
+                continue;
+            }
+        }
     }
 }
