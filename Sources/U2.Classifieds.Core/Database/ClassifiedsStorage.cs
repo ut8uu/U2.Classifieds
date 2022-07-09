@@ -20,6 +20,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json.Linq;
+using U2.Classifieds.Core.Database;
 
 namespace U2.Classifieds.Core;
 
@@ -28,11 +29,13 @@ public sealed class ClassifiedsStorage : IStorage
     private const string BranchesCollectionName = "Branches";
     private const string TopicsCollectionName = "Topics";
     private const string UsersCollectionName = "Users";
+    private const string ImagesCollectionName = "Images";
 
     private readonly IMongoDatabase _database;
     readonly IMongoCollection<BranchDto> _branchesCollection;
     readonly IMongoCollection<TopicDto> _topicsCollection;
     private readonly IMongoCollection<UserDto> _usersCollection;
+    private readonly IMongoCollection<ImageDto> _imagesCollection;
 
     public ClassifiedsStorage(IMongoDatabase database)
     {
@@ -40,6 +43,7 @@ public sealed class ClassifiedsStorage : IStorage
         _branchesCollection = database.GetCollection<BranchDto>(BranchesCollectionName);
         _topicsCollection = database.GetCollection<TopicDto>(TopicsCollectionName);
         _usersCollection = database.GetCollection<UserDto>(UsersCollectionName);
+        _imagesCollection = database.GetCollection<ImageDto>(ImagesCollectionName);
     }
 
     #region Branches
@@ -237,4 +241,34 @@ public sealed class ClassifiedsStorage : IStorage
 
     #endregion
 
+    #region Images
+
+    public async Task<bool> HasImageAsync(string url, CancellationToken cancellationToken)
+    {
+        return await TryGetImageAsync(url, cancellationToken) != null;
+    }
+
+    public async Task<ImageDto> TryGetImageAsync(FilterDefinition<ImageDto> filter, CancellationToken cancellationToken)
+    {
+        using var cursor = await _imagesCollection.FindAsync(filter, options: null, cancellationToken);
+        return cursor.FirstOrDefault();
+    }
+
+    public Task<ImageDto> TryGetImageAsync(string url, CancellationToken cancellationToken)
+    {
+        return _imagesCollection.Find(x => x.Url == url)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task AddImageAsync(ImageDto Image, CancellationToken cancellationToken)
+    {
+        return _imagesCollection.InsertOneAsync(Image, new InsertOneOptions(), cancellationToken);
+    }
+
+    public Task UpdateImageAsync(ImageDto image, CancellationToken cancellationToken)
+    {
+        return _imagesCollection.ReplaceOneAsync(x => x.Url == image.Url, image, new ReplaceOptions { }, cancellationToken);
+    }
+
+    #endregion
 }

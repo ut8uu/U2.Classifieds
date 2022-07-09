@@ -25,6 +25,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using MongoDB.Driver.GeoJsonObjectModel;
+using U2.Classifieds.Core.Database;
 using U2.Classifieds.Core.Impl;
 
 namespace U2.Classifieds.Core;
@@ -314,6 +315,15 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
         await Service.UpdateTopicAsync(topic, Token);
         await Service.AddOrUpdateUserAsync(user, Token);
+
+        foreach (var topicImage in topic.Images)
+        {
+            var image = new ImageDto
+            {
+                Url = topicImage,
+            };
+            await Service.AddOrUpdateImageAsync(image, Token);
+        }
     }
 
     public static void ParseTopicPage(string content, TopicDto topic)

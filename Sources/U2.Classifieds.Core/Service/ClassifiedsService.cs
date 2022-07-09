@@ -26,6 +26,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using U2.Classifieds.Core.Database;
 
 namespace U2.Classifieds.Core;
 
@@ -143,6 +144,30 @@ public sealed class ClassifiedsService
         else
         {
             await _storage.AddUserAsync(user, cancellationToken);
+        }
+    }
+
+    #endregion
+
+    #region Users
+
+    public async Task<ImageDto> GetWaitingImageAsync(CancellationToken cancellationToken)
+    {
+        var filterBuilder = Builders<ImageDto>.Filter;
+        var filter = filterBuilder.Eq(x => x.LoadState, UrlLoadState.Unknown);
+
+        return await _storage.TryGetImageAsync(filter, cancellationToken);
+    }
+
+    public async Task AddOrUpdateImageAsync(ImageDto image, CancellationToken cancellationToken)
+    {
+        if (await _storage.HasImageAsync(image.Url, cancellationToken))
+        {
+            await _storage.UpdateImageAsync(image, cancellationToken);
+        }
+        else
+        {
+            await _storage.AddImageAsync(image, cancellationToken);
         }
     }
 
