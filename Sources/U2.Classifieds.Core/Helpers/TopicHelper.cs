@@ -59,7 +59,8 @@ public static class TopicHelper
             return;
         }
 
-        if (!int.TryParse(matches[1], out var intValue))
+        var mValue = matches[1].Replace(" ", "");
+        if (!int.TryParse(mValue, out var intValue))
         {
             Console.WriteLine($"Cannot convert price to int in {topic.Url}");
             topic.ParserStatusCode = ParserStatusCode.Fail;

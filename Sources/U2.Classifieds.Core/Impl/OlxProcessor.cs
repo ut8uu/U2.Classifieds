@@ -172,6 +172,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     protected override async Task LoadBranchPageAsync()
     {
+        return;
         var branch = await Service.GetWaitingBranchAsync(Token);
         if (branch == null)
         {
@@ -321,6 +322,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
             var image = new ImageDto
             {
                 Url = topicImage,
+                TopicId = topic.Id,
             };
             await Service.AddOrUpdateImageAsync(image, Token);
         }

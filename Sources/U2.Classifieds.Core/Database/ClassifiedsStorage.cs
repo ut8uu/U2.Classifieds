@@ -267,7 +267,16 @@ public sealed class ClassifiedsStorage : IStorage
 
     public Task UpdateImageAsync(ImageDto image, CancellationToken cancellationToken)
     {
-        return _imagesCollection.ReplaceOneAsync(x => x.Url == image.Url, image, new ReplaceOptions { }, cancellationToken);
+        try
+        {
+            return _imagesCollection.ReplaceOneAsync(x => x.Url == image.Url, image, new ReplaceOptions { },
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return Task.FromException(ex);
+        }
     }
 
     #endregion
