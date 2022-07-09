@@ -98,4 +98,21 @@ public static class TopicHelper
             }
         }
     }
+
+    public static void ExtractProperties(HtmlDocument doc, TopicDto topic)
+    {
+        if (doc.DocumentNode.InnerText.Contains("Состояние: Б/у", StringComparison.InvariantCultureIgnoreCase))
+        {
+            topic.ItemCondition = ItemCondition.Used;
+        }
+        else if (doc.DocumentNode.InnerText.Contains("Состояние: Новый", StringComparison.InvariantCultureIgnoreCase))
+        {
+            topic.ItemCondition = ItemCondition.New;
+        }
+        
+        if (doc.DocumentNode.InnerText.Contains("OLX Доставка", StringComparison.InvariantCultureIgnoreCase))
+        {
+            topic.DeliveryInfo.Add("OLX Доставка");
+        }
+    }
 }

@@ -338,6 +338,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
         TopicHelper.ExtractTopicDescription(doc, topic);        
         TopicHelper.ExtractTopicPrice(doc, topic);
         TopicHelper.ExtractTopicImages(doc, topic);
+        TopicHelper.ExtractProperties(doc, topic);
 
         topic.ParserStatusCode = ParserStatusCode.Success;
     }

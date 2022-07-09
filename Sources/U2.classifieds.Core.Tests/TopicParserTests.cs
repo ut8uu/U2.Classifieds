@@ -16,6 +16,8 @@ namespace U2.classifieds.Core.Tests
             Assert.Equal("грн", topic.Currency);
             Assert.NotNull(topic.Images);
             Assert.Equal(4, topic.Images.Count);
+            Assert.Equal(ItemCondition.Used, topic.ItemCondition);
+            Assert.Contains("OLX Доставка", topic.DeliveryInfo);
         }
     }
 }

@@ -34,7 +34,7 @@ public sealed class TopicDto
     public SellerType SellerType { get; set; }
     public ItemCondition ItemCondition { get; set; }
     public List<string> Phones { get; set; }
-    public List<string> DeliveryInfo { get; set; }
+    public List<string> DeliveryInfo { get; set; } = new();
     public UrlLoadState LoadState { get; set; }
     public UrlLoadStatusCode LoadStatusCode { get; set; }
     public ParserStatusCode ParserStatusCode { get; set; }
