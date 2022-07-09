@@ -27,7 +27,7 @@ namespace U2.Classifieds.Core;
 
 public static class UrlHelper
 {
-    private const string OriginalIdInUrlRegExpr = "-([^.-]+).html";
+    private const string OriginalIdInUrlRegExpr = "-([^.-]+)\\.html";
 
     public static string GetOriginalIdFromUrl(string url)
     {

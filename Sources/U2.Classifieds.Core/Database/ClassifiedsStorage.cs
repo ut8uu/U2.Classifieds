@@ -118,22 +118,43 @@ public sealed class ClassifiedsStorage : IStorage
         return _topicsCollection.InsertOneAsync(Topic, new InsertOneOptions(), cancellationToken);
     }
 
+    private static TopicDto FixTopic(TopicDto topic)
+    {
+        if (topic == null)
+        {
+            return null;
+        }
+
+        if (topic.Images == null)
+        {
+            topic.Images = new List<string>();
+        }
+        if (topic.DeliveryInfo == null)
+        {
+            topic.DeliveryInfo = new List<string>();
+        }
+
+        return topic;
+    }
+
+
     public async Task<TopicDto> TryGetTopicAsync(FilterDefinition<TopicDto> filter, CancellationToken cancellationToken)
     {
         using var cursor = await _topicsCollection.FindAsync(filter, options: null, cancellationToken);
-        return cursor.FirstOrDefault();
+        var topic = cursor.FirstOrDefault();
+        return FixTopic(topic);
     }
 
-    public Task<TopicDto> TryGetTopicAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<TopicDto> TryGetTopicAsync(Guid id, CancellationToken cancellationToken)
     {
-        return _topicsCollection.Find(x => x.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
+        return FixTopic(await _topicsCollection.Find(x => x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken));
     }
 
-    public Task<TopicDto> TryGetTopicAsync(string url, CancellationToken cancellationToken)
+    public async Task<TopicDto> TryGetTopicAsync(string url, CancellationToken cancellationToken)
     {
-        return _topicsCollection.Find(x => x.Url == url)
-            .FirstOrDefaultAsync(cancellationToken);
+        return FixTopic(await _topicsCollection.Find(x => x.Url == url)
+            .FirstOrDefaultAsync(cancellationToken));
     }
 
     public Task UpdateTopicByOriginalIdAsync(TopicDto Topic, CancellationToken cancellationToken)
