@@ -33,4 +33,35 @@ public static class UrlHelper
     {
         return RegularExpressionHelper.MatchAndGetFirst(OriginalIdInUrlRegExpr, url);
     }
+
+    public static string TrimUrl(string url)
+    {
+        var x = url.Trim();
+        var idx = x.IndexOf('?');
+        if (idx > -1)
+        {
+            x = x[..idx];
+        }
+
+        return x;
+    }
+
+    public static string FixUrl(string url)
+    {
+        var x = TrimUrl(url);
+        if (x.StartsWith('/'))
+        {
+            x = $"https://www.olx.ua{x}";
+        }
+
+        x = x.Replace("/d/uk/obyavlenie", "/d/obyavlenie");
+
+        var pos = x.IndexOfAny(new[] { '?', '#' });
+        if (pos > -1)
+        {
+            x = x[..pos];
+        }
+
+        return x;
+    }
 }

@@ -103,7 +103,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
         {
             return Enumerable.Empty<BranchDto>().ToList();
         }
-        
+
         var rootBranch = await Service.GetBranchAsync("https://olx.ua/", Token);
         var list = new List<BranchDto>
         {
@@ -122,7 +122,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
                 var text = a.InnerText.Trim();
 
                 // all elements except the last
-                if (mainTitles.Any(x 
+                if (mainTitles.Any(x
                         => text.Equals(x, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     continue;
@@ -133,6 +133,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
                 {
                     url = $"https://www.olx.ua{url}";
                 }
+
                 var branch = await Service.GetBranchAsync(url, Token);
                 if (branch == null)
                 {
@@ -149,6 +150,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
                     branch.ParentId = list.Last().Id;
                     await Service.AddOrUpdateBranchAsync(branch, Token);
                 }
+
                 list.Add(branch);
             }
             else
@@ -230,7 +232,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
             {
                 var topicDto = new TopicDto
                 {
-                    Url = FixUrl(topic.Url),
+                    Url = UrlHelper.FixUrl(topic.Url),
                     Title = topic.Title,
                     BranchId = branchId,
                 };
@@ -238,25 +240,6 @@ public class OlxProcessor : ProcessorBase, IProcessor
                 await Service.AddTopicIfNotExistsAsync(topicDto, Token);
             }
         }
-    }
-
-    private string FixUrl(string url)
-    {
-        var x = TrimUrl(url);
-        if (x.StartsWith('/'))
-        {
-            x = $"https://www.olx.ua{x}";
-        }
-
-        x = x.Replace("/d/uk/obyavlenie", "/d/obyavlenie");
-
-        var pos = x.IndexOfAny(new[] {'?', '#'});
-        if (pos > -1)
-        {
-            x = x.Substring(0, pos);
-        }
-
-        return x;
     }
 
     private async Task<ClassifiedsPage> ParsePageAsync(string content)
@@ -278,14 +261,14 @@ public class OlxProcessor : ProcessorBase, IProcessor
             .Where(x =>
                 x.Contains("/d/uk/obyavlenie", StringComparison.InvariantCultureIgnoreCase)
                 || x.Contains("/d/obyavlenie", StringComparison.InvariantCultureIgnoreCase)
-                )
+            )
             .Select(x => x).ToList();
 
         foreach (var link in xx)
         {
             var topic = new TopicDto
             {
-                Url = FixUrl(link),
+                Url = UrlHelper.FixUrl(link),
                 BranchId = Guid.Empty,
                 LoadState = UrlLoadState.Unknown,
                 LoadStatusCode = UrlLoadStatusCode.Unknown,
@@ -326,7 +309,11 @@ public class OlxProcessor : ProcessorBase, IProcessor
         topic.LoadStatusCode = UrlLoadStatusCode.Success;
         ParseTopicPage(content, topic);
 
+        var user = new UserDto();
+        TopicHelper.ExtractUserInfo(content, user);
+
         await Service.UpdateTopicAsync(topic, Token);
+        await Service.AddOrUpdateUserAsync(user, Token);
     }
 
     public static void ParseTopicPage(string content, TopicDto topic)
@@ -335,12 +322,16 @@ public class OlxProcessor : ProcessorBase, IProcessor
         doc.LoadHtml(content);
 
         TopicHelper.ExtractTopicTitle(doc, topic);
-        TopicHelper.ExtractTopicDescription(doc, topic);        
+        TopicHelper.ExtractTopicDescription(doc, topic);
         TopicHelper.ExtractTopicPrice(doc, topic);
         TopicHelper.ExtractTopicImages(doc, topic);
         TopicHelper.ExtractProperties(doc, topic);
 
         topic.ParserStatusCode = ParserStatusCode.Success;
+    }
+
+    public static void ExtractUserInfo(string content, UserDto user)
+    {
     }
 }
 

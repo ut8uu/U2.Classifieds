@@ -203,18 +203,6 @@ public abstract class ProcessorBase
 
         return responseString;
     }
-
-    protected string TrimUrl(string url)
-    {
-        var x = url;
-        var idx = x.IndexOf('?');
-        if (idx > -1)
-        {
-            x = x.Substring(0, idx);
-        }
-
-        return x;
-    }
 }
 
 public enum UrlKind

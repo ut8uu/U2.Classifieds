@@ -22,14 +22,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace U2.Classifieds.Core.Database
+namespace U2.Classifieds.Core;
+
+public sealed class UserDto
 {
-    internal sealed class UserDto
-    {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Url { get; set; }
-        public DateTime RegistrationTimestamp { get; set; }
-        public List<string> Phones { get; set; }
-    }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string OriginalId { get; set; }
+    public string Name { get; set; }
+    public string Url { get; set; }
+    public DateTime RegistrationTimestamp { get; set; }
+    public List<string> Phones { get; set; } = new();
 }

@@ -19,5 +19,16 @@ namespace U2.classifieds.Core.Tests
             Assert.Equal(ItemCondition.Used, topic.ItemCondition);
             Assert.Contains("OLX Доставка", topic.DeliveryInfo);
         }
+
+        [Fact]
+        public void CanExtractUser()
+        {
+            var content = TestResources.topic1;
+            var user = new UserDto();
+            TopicHelper.ExtractUserInfo(content, user);
+            Assert.Equal("6speq", user.OriginalId);
+            Assert.Equal("https://www.olx.ua/d/list/user/6speq/", user.Url);
+            Assert.Equal("Олена", user.Name);
+        }
     }
 }

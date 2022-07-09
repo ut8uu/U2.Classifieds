@@ -26,7 +26,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using U2.Classifieds.Core;
-using U2.Classifieds.Core.Database;
 
 namespace U2.Classifieds.Loader;
 

@@ -24,6 +24,8 @@ namespace U2.Classifieds.Core;
 
 public interface IStorage
 {
+    #region Branches
+
     Task AddBranchAsync(BranchDto branch, CancellationToken cancellationToken);
     Task<BranchDto> TryGetBranchAsync(int originalBranchId, CancellationToken cancellationToken);
     Task<BranchDto> TryGetBranchAsync(Guid branchId, CancellationToken cancellationToken);
@@ -31,6 +33,13 @@ public interface IStorage
     Task DeleteBranchAsync(Guid id, CancellationToken cancellationToken);
     IAsyncEnumerable<BranchDto> GetBranchesAsync(CancellationToken cancellationToken);
     IAsyncEnumerable<BranchDto> GetBranchesAsync(Guid parentId, CancellationToken cancellationToken);
+
+    Task<bool> HasBranchAsync(string branch, CancellationToken cancellationToken);
+    Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken);
+
+    #endregion
+
+    #region Topics
 
     Task AddTopicAsync(TopicDto topic, CancellationToken cancellationToken);
     Task<TopicDto> TryGetTopicAsync(Guid id, CancellationToken cancellationToken);
@@ -45,7 +54,17 @@ public interface IStorage
 
     Task<bool> HasTopicWithUrlAsync(string url, CancellationToken cancellationToken);
     Task<bool> HasTopicWithOriginalIdAsync(string originalId, CancellationToken cancellationToken);
-    Task<bool> HasBranchAsync(string branch, CancellationToken cancellationToken);
-    Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken);
+
+    #endregion
+
+    #region Users
+
+    Task<bool> HasUserAsync(string originalId, CancellationToken cancellationToken);
+    Task<UserDto> TryGetUserAsync(string originalId, CancellationToken cancellationToken);
+    Task AddUserAsync(UserDto topic, CancellationToken cancellationToken);
+    Task UpdateUserAsync(UserDto topic, CancellationToken cancellationToken);
+
+    #endregion
+
 
 }

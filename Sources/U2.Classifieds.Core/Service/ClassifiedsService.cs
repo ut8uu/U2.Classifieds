@@ -130,6 +130,22 @@ public sealed class ClassifiedsService
         await _storage.UpdateTopicByIdAsync(topic, cancellationToken);
     }
 
+    #endregion
+
+    #region Users
+
+    public async Task AddOrUpdateUserAsync(UserDto user, CancellationToken cancellationToken)
+    {
+        if (await _storage.HasUserAsync(user.OriginalId, cancellationToken))
+        {
+            await _storage.UpdateUserAsync(user, cancellationToken);
+        }
+        else
+        {
+            await _storage.AddUserAsync(user, cancellationToken);
+        }
+    }
 
     #endregion
+
 }

@@ -27,17 +27,22 @@ public sealed class ClassifiedsStorage : IStorage
 {
     private const string BranchesCollectionName = "Branches";
     private const string TopicsCollectionName = "Topics";
+    private const string UsersCollectionName = "Users";
 
     private readonly IMongoDatabase _database;
     readonly IMongoCollection<BranchDto> _branchesCollection;
     readonly IMongoCollection<TopicDto> _topicsCollection;
+    private readonly IMongoCollection<UserDto> _usersCollection;
 
     public ClassifiedsStorage(IMongoDatabase database)
     {
         _database = database;
         _branchesCollection = database.GetCollection<BranchDto>(BranchesCollectionName);
         _topicsCollection = database.GetCollection<TopicDto>(TopicsCollectionName);
+        _usersCollection = database.GetCollection<UserDto>(UsersCollectionName);
     }
+
+    #region Branches
 
     public Task AddBranchAsync(BranchDto branch, CancellationToken cancellationToken)
     {
@@ -90,6 +95,24 @@ public sealed class ClassifiedsStorage : IStorage
         }
     }
 
+    public Task<bool> HasBranchAsync(string url, CancellationToken cancellationToken)
+    {
+        var branchesCount = _branchesCollection.Find(x => x.Url == url)
+            .CountDocumentsAsync(cancellationToken);
+        return Task.FromResult(branchesCount.Result > 0);
+    }
+
+    public Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken)
+    {
+        var hasBranch = _branchesCollection.Find(x => x.OriginalId == originalId)
+            .Any(cancellationToken);
+        return Task.FromResult(hasBranch);
+    }
+    
+    #endregion
+
+    #region Topics
+
     public Task AddTopicAsync(TopicDto Topic, CancellationToken cancellationToken)
     {
         return _topicsCollection.InsertOneAsync(Topic, new InsertOneOptions(), cancellationToken);
@@ -100,7 +123,7 @@ public sealed class ClassifiedsStorage : IStorage
         using var cursor = await _topicsCollection.FindAsync(filter, options: null, cancellationToken);
         return cursor.FirstOrDefault();
     }
-    
+
     public Task<TopicDto> TryGetTopicAsync(Guid id, CancellationToken cancellationToken)
     {
         return _topicsCollection.Find(x => x.Id == id)
@@ -166,17 +189,31 @@ public sealed class ClassifiedsStorage : IStorage
         return Task.FromResult(foundTopic != null);
     }
 
-    public Task<bool> HasBranchAsync(string url, CancellationToken cancellationToken)
+    #endregion
+
+    #region Users
+
+    public async Task<bool> HasUserAsync(string originalId, CancellationToken cancellationToken)
     {
-        var branchesCount = _branchesCollection.Find(x => x.Url == url)
-            .CountDocumentsAsync(cancellationToken);
-        return Task.FromResult(branchesCount.Result > 0);
+        return await TryGetUserAsync(originalId, cancellationToken) != null;
     }
 
-    public Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken)
+    public Task<UserDto> TryGetUserAsync(string originalId, CancellationToken cancellationToken)
     {
-        var hasBranch = _branchesCollection.Find(x => x.OriginalId == originalId)
-            .Any(cancellationToken);
-        return Task.FromResult(hasBranch);
+        return _usersCollection.Find(x => x.OriginalId == originalId)
+            .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public Task AddUserAsync(UserDto user, CancellationToken cancellationToken)
+    {
+        return _usersCollection.InsertOneAsync(user, new InsertOneOptions(), cancellationToken);
+    }
+
+    public Task UpdateUserAsync(UserDto user, CancellationToken cancellationToken)
+    {
+        return _usersCollection.ReplaceOneAsync(x => x.OriginalId == user.OriginalId, user, new ReplaceOptions { }, cancellationToken);
+    }
+
+    #endregion
+
 }

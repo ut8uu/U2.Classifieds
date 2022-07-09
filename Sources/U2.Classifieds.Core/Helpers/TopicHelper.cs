@@ -115,4 +115,38 @@ public static class TopicHelper
             topic.DeliveryInfo.Add("OLX Доставка");
         }
     }
+
+    /// <summary>
+    /// Extract information about the user from the topic page.
+    /// </summary>
+    public static void ExtractUserInfo(string content, UserDto user)
+    {
+        var doc = new HtmlDocument();
+        doc.LoadHtml(content);
+
+        var xpathPrefix = "//div[@data-cy='seller_card']";
+        var urlNode = doc.DocumentNode.SelectSingleNode($"{xpathPrefix}//a");
+        if (urlNode == null)
+        {
+            Console.WriteLine($"Cannot find the user link.");
+            return;
+        }
+
+        var url = urlNode.Attributes["href"];
+        if (url == null)
+        {
+            Console.WriteLine($"Cannot recognize the user link.");
+            return;
+        }
+        user.Url = UrlHelper.FixUrl(url.Value);
+        user.OriginalId = user.Url.Split('/', StringSplitOptions.RemoveEmptyEntries).Last();
+
+        var nameNode = doc.DocumentNode.SelectSingleNode($"{xpathPrefix}//h4");
+        if (nameNode == null)
+        {
+            Console.WriteLine($"Cannot recognize the user name.");
+            return;
+        }
+        user.Name = nameNode.InnerText.Trim();
+    }
 }
