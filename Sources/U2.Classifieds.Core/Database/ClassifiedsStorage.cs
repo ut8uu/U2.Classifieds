@@ -44,6 +44,12 @@ public sealed class ClassifiedsStorage : IStorage
         return _branchesCollection.InsertOneAsync(branch, new InsertOneOptions(), cancellationToken);
     }
 
+    public async Task<BranchDto> TryGetBranchAsync(FilterDefinition<BranchDto> filter, CancellationToken cancellationToken)
+    {
+        using var cursor = await _branchesCollection.FindAsync(filter, options: null, cancellationToken);
+        return cursor.FirstOrDefault();
+    }
+
     public Task<BranchDto> TryGetBranchAsync(int originalBranchId, CancellationToken cancellationToken)
     {
         return _branchesCollection.Find(b => b.OriginalId == originalBranchId)
@@ -89,6 +95,12 @@ public sealed class ClassifiedsStorage : IStorage
         return _topicsCollection.InsertOneAsync(Topic, new InsertOneOptions(), cancellationToken);
     }
 
+    public async Task<TopicDto> TryGetTopicAsync(FilterDefinition<TopicDto> filter, CancellationToken cancellationToken)
+    {
+        using var cursor = await _topicsCollection.FindAsync(filter, options: null, cancellationToken);
+        return cursor.FirstOrDefault();
+    }
+    
     public Task<TopicDto> TryGetTopicAsync(Guid id, CancellationToken cancellationToken)
     {
         return _topicsCollection.Find(x => x.Id == id)
@@ -101,9 +113,14 @@ public sealed class ClassifiedsStorage : IStorage
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public Task UpdateTopicAsync(TopicDto Topic, CancellationToken cancellationToken)
+    public Task UpdateTopicByOriginalIdAsync(TopicDto Topic, CancellationToken cancellationToken)
     {
-        return _topicsCollection.ReplaceOneAsync(x => x.Url == Topic.Url, Topic, new ReplaceOptions { }, cancellationToken);
+        return _topicsCollection.ReplaceOneAsync(x => x.OriginalId == Topic.OriginalId, Topic, new ReplaceOptions { }, cancellationToken);
+    }
+
+    public Task UpdateTopicByIdAsync(TopicDto Topic, CancellationToken cancellationToken)
+    {
+        return _topicsCollection.ReplaceOneAsync(x => x.Id == Topic.Id, Topic, new ReplaceOptions { }, cancellationToken);
     }
 
     public Task DeleteTopicAsync(Guid id, CancellationToken cancellationToken)
@@ -142,7 +159,7 @@ public sealed class ClassifiedsStorage : IStorage
         return Task.FromResult(foundTopic != null);
     }
 
-    public Task<bool> HasTopicWithIdAsync(string originalId, CancellationToken cancellationToken)
+    public Task<bool> HasTopicWithOriginalIdAsync(string originalId, CancellationToken cancellationToken)
     {
         var foundTopic = _topicsCollection.Find(x => x.OriginalId == originalId)
             .FirstOrDefault(cancellationToken);
@@ -161,11 +178,5 @@ public sealed class ClassifiedsStorage : IStorage
         var hasBranch = _branchesCollection.Find(x => x.OriginalId == originalId)
             .Any(cancellationToken);
         return Task.FromResult(hasBranch);
-    }
-
-    public async Task<BranchDto> TryGetBranchAsync(FilterDefinition<BranchDto> filter, CancellationToken cancellationToken)
-    {
-        using var cursor = await _branchesCollection.FindAsync(filter, options: null, cancellationToken);
-        return cursor.FirstOrDefault();
     }
 }

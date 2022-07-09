@@ -35,7 +35,7 @@ public interface IStorage
     Task AddTopicAsync(TopicDto topic, CancellationToken cancellationToken);
     Task<TopicDto> TryGetTopicAsync(Guid id, CancellationToken cancellationToken);
     Task<TopicDto> TryGetTopicAsync(string topic, CancellationToken cancellationToken);
-    Task UpdateTopicAsync(TopicDto topic, CancellationToken cancellationToken);
+    Task UpdateTopicByOriginalIdAsync(TopicDto topic, CancellationToken cancellationToken);
     Task DeleteTopicAsync(Guid id, CancellationToken cancellationToken);
 
     IAsyncEnumerable<TopicDto> GetTopicsAsync(CancellationToken cancellationToken);
@@ -44,7 +44,7 @@ public interface IStorage
     Task<TopicDto> GetTopicAsync(BsonDocument filter, CancellationToken token);
 
     Task<bool> HasTopicWithUrlAsync(string url, CancellationToken cancellationToken);
-    Task<bool> HasTopicWithIdAsync(string originalId, CancellationToken cancellationToken);
+    Task<bool> HasTopicWithOriginalIdAsync(string originalId, CancellationToken cancellationToken);
     Task<bool> HasBranchAsync(string branch, CancellationToken cancellationToken);
     Task<bool> HasBranchAsync(int originalId, CancellationToken cancellationToken);
 

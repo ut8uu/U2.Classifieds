@@ -56,16 +56,34 @@ public static class FileCache
         {
             id4 = string.Empty;
         }
-        var path = Path.Combine(cachePath,"Cache", folder, 
-            id1.ToString().PadLeft(3, '0'), 
-            id2.ToString().PadLeft(3, '0'), 
+        var path = Path.Combine(cachePath, "Cache", folder,
+            id1.ToString().PadLeft(3, '0'),
+            id2.ToString().PadLeft(3, '0'),
             $"{id3.ToString().PadLeft(3, '0')}{id4}.html");
+        return path;
+    }
+
+    private static string IdToPath(string folder, string id, int start = 0)
+    {
+        var cachePath = CoreSettings.Default.CacheDirectory;
+        var id1 = id.Substring(0, 1);
+        var id2 = id.Substring(1, 1);
+        var id3 = id.Substring(2, 1);
+        var id4 = id.Substring(3, 1);
+        var id5 = id.Substring(4);
+        if (start == 0)
+        {
+            id4 = string.Empty;
+        }
+        var path = Path.Combine(cachePath, "Cache", folder,
+            id1, id2, id3, id4, $"{id5}.html");
         return path;
     }
 
     public static string TryGetTopicCache(string url)
     {
-        var path = UrlToPath("topics", url);
+        var id = UrlHelper.GetOriginalIdFromUrl(url);
+        var path = IdToPath("topics", id);
         if (File.Exists(path))
         {
             return File.ReadAllText(path);
@@ -94,7 +112,8 @@ public static class FileCache
 
     public static void PutTopicCache(string url, string content)
     {
-        var path = UrlToPath("topics", url);
+        var id = UrlHelper.GetOriginalIdFromUrl(url);
+        var path = IdToPath("topics", id);
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         File.WriteAllText(path, content);
     }

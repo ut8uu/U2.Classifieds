@@ -169,7 +169,6 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     protected override async Task LoadBranchPageAsync()
     {
-        return;
         var branch = await Service.GetWaitingBranchAsync(Token);
         if (branch == null)
         {
@@ -209,20 +208,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
                 */
 
                 var page = await ParsePageAsync(content);
-                if (page.Topics.Any())
-                {
-                    foreach (var topic in page.Topics)
-                    {
-                        var topicDto = new TopicDto
-                        {
-                            Url = topic.Url,
-                            Title = topic.Title,
-                            BranchId = branch.Id,
-                        };
-                        Console.WriteLine($"Added topic {topic.Url}");
-                        await Service.AddTopicIfNotExistsAsync(topicDto, Token);
-                    }
-                }
+                await StoreTopicsAsync(branch.Id, page.Topics, Token);
             }
         }
         catch (Exception ex)
@@ -234,6 +220,43 @@ public class OlxProcessor : ProcessorBase, IProcessor
         branch.LoadStatusCode = UrlLoadStatusCode.Success;
         branch.NextLoadTime = DateTime.UtcNow.AddHours(1);
         await Service.AddOrUpdateBranchAsync(branch, Token);
+    }
+
+    private async Task StoreTopicsAsync(Guid branchId, List<TopicDto> pageTopics, CancellationToken token)
+    {
+        if (pageTopics.Any())
+        {
+            foreach (var topic in pageTopics)
+            {
+                var topicDto = new TopicDto
+                {
+                    Url = FixUrl(topic.Url),
+                    Title = topic.Title,
+                    BranchId = branchId,
+                };
+                Console.WriteLine($"Added topic {topic.Url}");
+                await Service.AddTopicIfNotExistsAsync(topicDto, Token);
+            }
+        }
+    }
+
+    private string FixUrl(string url)
+    {
+        var x = TrimUrl(url);
+        if (x.StartsWith('/'))
+        {
+            x = $"https://www.olx.ua{x}";
+        }
+
+        x = x.Replace("/d/uk/obyavlenie", "/d/obyavlenie");
+
+        var pos = x.IndexOfAny(new[] {'?', '#'});
+        if (pos > -1)
+        {
+            x = x.Substring(0, pos);
+        }
+
+        return x;
     }
 
     private async Task<ClassifiedsPage> ParsePageAsync(string content)
@@ -262,21 +285,79 @@ public class OlxProcessor : ProcessorBase, IProcessor
         {
             var topic = new TopicDto
             {
-                Url = TrimUrl(link),
+                Url = FixUrl(link),
                 BranchId = Guid.Empty,
                 LoadState = UrlLoadState.Unknown,
                 LoadStatusCode = UrlLoadStatusCode.Unknown,
             };
             result.Topics.Add(topic);
-            await Service.AddOrUpdateTopicAsync(topic, Token);
+            await Service.AddTopicIfNotExistsAsync(topic, Token);
         }
 
         return result;
     }
 
-    protected override Task LoadTopicPageAsync()
+    protected override async Task LoadTopicPageAsync()
     {
-        return Task.FromResult(0);
+        //return Task.FromResult(0);
+        var topic = await Service.GetWaitingTopicAsync(Token);
+        if (topic == null)
+        {
+            return;
+        }
+
+        Console.WriteLine($"Processing topic {topic.Url}");
+
+        var urlInfo = new UrlInfo(topic.Url);
+        var content = await DownloadAsync(urlInfo, UrlKind.Topic, Token);
+        if (string.IsNullOrEmpty(content))
+        {
+            topic.LoadState = UrlLoadState.Loaded;
+            topic.LoadStatusCode = UrlLoadStatusCode.Failure;
+            topic.ParserStatusCode = ParserStatusCode.Unknown;
+            await Service.AddOrUpdateTopicAsync(topic, Token);
+            return;
+        }
+
+        var classifiedsPage = await ParsePageAsync(content);
+        //await StoreTopicsAsync(Guid.Empty, classifiedsPage.Topics, Token);
+
+        topic.LoadState = UrlLoadState.Loaded;
+        topic.LoadStatusCode = UrlLoadStatusCode.Success;
+        ParseTopicPage(content, topic);
+
+        await Service.UpdateTopicAsync(topic, Token);
+    }
+
+    internal void ParseTopicPage(string content, TopicDto topic)
+    {
+        var doc = new HtmlDocument();
+        doc.LoadHtml(content);
+
+        var titleXPath = "//h1[@data-cy='ad_title']";
+        var titleNode = doc.DocumentNode.SelectSingleNode(titleXPath);
+
+        if (titleNode == null)
+        {
+            Console.WriteLine($"Cannot find title in {topic.Url}");
+            topic.ParserStatusCode = ParserStatusCode.Fail;
+            return;
+        }
+
+        topic.Title = titleNode.InnerText.Trim();
+
+        var descriptionXPath = "/html/body/div/div/div[3]/div[3]/div/div[2]";
+        var descriptionNode = doc.DocumentNode.SelectSingleNode(descriptionXPath);
+        if (descriptionNode == null)
+        {
+            Console.WriteLine($"Cannot find description in {topic.Url}");
+            topic.ParserStatusCode = ParserStatusCode.Fail;
+            return;
+        }
+
+        topic.Description = descriptionNode.OuterHtml;
+
+        topic.ParserStatusCode = ParserStatusCode.Success;
     }
 }
 

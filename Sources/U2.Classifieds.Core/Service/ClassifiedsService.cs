@@ -38,6 +38,8 @@ public sealed class ClassifiedsService
         _storage = storage;
     }
 
+    #region Branches
+
     public async Task<BranchDto> GetWaitingBranchAsync(CancellationToken cancellationToken)
     {
         var filterBuilder = Builders<BranchDto>.Filter;
@@ -66,26 +68,6 @@ public sealed class ClassifiedsService
         }
     }
 
-    public async Task AddTopicIfNotExistsAsync(TopicDto topic, CancellationToken cancellationToken)
-    {
-        if (!(await _storage.HasTopicWithUrlAsync(topic.Url, cancellationToken)))
-        {
-            await _storage.AddTopicAsync(topic, cancellationToken);
-        }
-    }
-
-    public async Task AddOrUpdateTopicAsync(TopicDto topic, CancellationToken cancellationToken)
-    {
-        if (await _storage.HasBranchAsync(topic.Url, cancellationToken))
-        {
-            await _storage.UpdateTopicAsync(topic, cancellationToken);
-        }
-        else
-        {
-            await _storage.AddTopicAsync(topic, cancellationToken);
-        }
-    }
-
     public Task<BranchDto> GetBranchAsync(string url, CancellationToken token)
     {
         var filterBuilder = Builders<BranchDto>.Filter;
@@ -99,4 +81,55 @@ public sealed class ClassifiedsService
         var filter = filterBuilder.Eq(x => x.Title, title);
         return _storage.TryGetBranchAsync(filter, token);
     }
+
+    #endregion
+
+    #region Topics
+
+    private static void FixTopic(TopicDto topic)
+    {
+        if (string.IsNullOrEmpty(topic.OriginalId))
+        {
+            topic.OriginalId = UrlHelper.GetOriginalIdFromUrl(topic.Url);
+        }
+    }
+
+    public async Task<TopicDto> GetWaitingTopicAsync(CancellationToken cancellationToken)
+    {
+        var filterBuilder = Builders<TopicDto>.Filter;
+        var filter = filterBuilder.Eq(x => x.LoadState, UrlLoadState.Unknown);
+
+        return await _storage.TryGetTopicAsync(filter, cancellationToken);
+    }
+
+    public async Task AddTopicIfNotExistsAsync(TopicDto topic, CancellationToken cancellationToken)
+    {
+        FixTopic(topic);
+        if (!(await _storage.HasTopicWithOriginalIdAsync(topic.OriginalId, cancellationToken)))
+        {
+            await _storage.AddTopicAsync(topic, cancellationToken);
+        }
+    }
+
+    public async Task AddOrUpdateTopicAsync(TopicDto topic, CancellationToken cancellationToken)
+    {
+        FixTopic(topic);
+        if (await _storage.HasTopicWithOriginalIdAsync(topic.OriginalId, cancellationToken))
+        {
+            await _storage.UpdateTopicByOriginalIdAsync(topic, cancellationToken);
+        }
+        else
+        {
+            await _storage.AddTopicAsync(topic, cancellationToken);
+        }
+    }
+
+    public async Task UpdateTopicAsync(TopicDto topic, CancellationToken cancellationToken)
+    {
+        FixTopic(topic);
+        await _storage.UpdateTopicByIdAsync(topic, cancellationToken);
+    }
+
+
+    #endregion
 }

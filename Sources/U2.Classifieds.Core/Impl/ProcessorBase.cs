@@ -89,27 +89,20 @@ public abstract class ProcessorBase
 
     private void LoadTopicPageCallbackFunc(object state)
     {
-        return;
-        var hasLock = false;
-
-        try
+        lock (LoadTopicPageLockObject)
         {
-            Monitor.TryEnter(LoadTopicPageLockObject, ref hasLock);
-            if (!hasLock)
-            {
-                return;
-            }
-
             StopLoadTopicTimer();
-
-            var task = LoadTopicPageAsync();
-            task.Wait(Token);
-        }
-        finally
-        {
-            if (hasLock)
+            try
             {
-                Monitor.Exit(LoadTopicPageLockObject);
+                var task = LoadTopicPageAsync();
+                task.Wait(Token);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
                 StartLoadTopicTimer();
             }
         }

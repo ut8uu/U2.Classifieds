@@ -17,25 +17,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace U2.Classifieds.Core;
 
-public sealed class TopicDto
+public static class UrlHelper
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    public Guid BranchId { get; set; }
-    public string OriginalId { get; set; }
-    public string Url { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
-    public int Price { get; set; }
-    public Guid UserId { get; set; }
-    public List<string> Images { get; set; }
-    public SellerType SellerType { get; set; }
-    public ItemCondition ItemCondition { get; set; }
-    public List<string> Phones { get; set; }
-    public List<string> DeliveryInfo { get; set; }
-    public UrlLoadState LoadState { get; set; }
-    public UrlLoadStatusCode LoadStatusCode { get; set; }
-    public ParserStatusCode ParserStatusCode { get; set; }
-}
+    private const string OriginalIdInUrlRegExpr = "-([^.-]+).html";
 
+    public static string GetOriginalIdFromUrl(string url)
+    {
+        return RegularExpressionHelper.MatchAndGetFirst(OriginalIdInUrlRegExpr, url);
+    }
+}
