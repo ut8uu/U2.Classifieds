@@ -5,7 +5,9 @@ VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "U2.Classifieds.Core", "U2.Classifieds.Core\U2.Classifieds.Core.csproj", "{F5855693-3607-4EA0-BE32-664833ADA919}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "U2.Classifieds.Loader", "U2.Classifieds.Loader\U2.Classifieds.Loader.csproj", "{CDB25AEA-403E-4685-B637-2AD2BFBE7E01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "U2.Classifieds.Loader", "U2.Classifieds.Loader\U2.Classifieds.Loader.csproj", "{CDB25AEA-403E-4685-B637-2AD2BFBE7E01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "U2.classifieds.Core.Tests", "U2.classifieds.Core.Tests\U2.classifieds.Core.Tests.csproj", "{FF1EBE75-3E9D-4E8C-B718-280012E9C165}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{CDB25AEA-403E-4685-B637-2AD2BFBE7E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDB25AEA-403E-4685-B637-2AD2BFBE7E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDB25AEA-403E-4685-B637-2AD2BFBE7E01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF1EBE75-3E9D-4E8C-B718-280012E9C165}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF1EBE75-3E9D-4E8C-B718-280012E9C165}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF1EBE75-3E9D-4E8C-B718-280012E9C165}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF1EBE75-3E9D-4E8C-B718-280012E9C165}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

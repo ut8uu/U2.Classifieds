@@ -28,6 +28,7 @@ public sealed class TopicDto
     public string Title { get; set; }
     public string Description { get; set; }
     public int Price { get; set; }
+    public string Currency { get; set; }
     public Guid UserId { get; set; }
     public List<string> Images { get; set; }
     public SellerType SellerType { get; set; }

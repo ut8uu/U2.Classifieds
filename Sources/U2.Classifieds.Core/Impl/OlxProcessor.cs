@@ -329,33 +329,15 @@ public class OlxProcessor : ProcessorBase, IProcessor
         await Service.UpdateTopicAsync(topic, Token);
     }
 
-    internal void ParseTopicPage(string content, TopicDto topic)
+    public static void ParseTopicPage(string content, TopicDto topic)
     {
         var doc = new HtmlDocument();
         doc.LoadHtml(content);
 
-        var titleXPath = "//h1[@data-cy='ad_title']";
-        var titleNode = doc.DocumentNode.SelectSingleNode(titleXPath);
-
-        if (titleNode == null)
-        {
-            Console.WriteLine($"Cannot find title in {topic.Url}");
-            topic.ParserStatusCode = ParserStatusCode.Fail;
-            return;
-        }
-
-        topic.Title = titleNode.InnerText.Trim();
-
-        var descriptionXPath = "/html/body/div/div/div[3]/div[3]/div/div[2]";
-        var descriptionNode = doc.DocumentNode.SelectSingleNode(descriptionXPath);
-        if (descriptionNode == null)
-        {
-            Console.WriteLine($"Cannot find description in {topic.Url}");
-            topic.ParserStatusCode = ParserStatusCode.Fail;
-            return;
-        }
-
-        topic.Description = descriptionNode.OuterHtml;
+        TopicHelper.ExtractTopicTitle(doc, topic);
+        TopicHelper.ExtractTopicDescription(doc, topic);        
+        TopicHelper.ExtractTopicPrice(doc, topic);
+        TopicHelper.ExtractTopicImages(doc, topic);
 
         topic.ParserStatusCode = ParserStatusCode.Success;
     }
