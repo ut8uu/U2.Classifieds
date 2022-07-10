@@ -94,6 +94,7 @@ public static class FileCache
 
     public static string TryGetBranchCache(string url)
     {
+        return null;
         var path = UrlToPath("branches", url);
         if (File.Exists(path))
         {
