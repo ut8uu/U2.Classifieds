@@ -15,6 +15,7 @@ public abstract class ProcessorBase
     private readonly ClassifiedsService _service;
     private readonly Timer _topicLoadTimer;
     private readonly Timer _branchLoadTimer;
+    private readonly Timer _imageLoadTimer;
     private readonly HttpClient _client = new();
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly int _numberOfRetriesOnFailure = 5;
@@ -33,6 +34,8 @@ public abstract class ProcessorBase
         StopLoadTopicTimer();
         _branchLoadTimer = new Timer(LoadBranchPageCallbackFunc);
         StopLoadBranchTimer();
+        _imageLoadTimer = new Timer(LoadImageCallbackFunc);
+        StopLoadImageTimer();
 
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         _win1251 = Encoding.GetEncoding("windows-1251");
@@ -68,6 +71,7 @@ public abstract class ProcessorBase
         _cancellationTokenSource = new CancellationTokenSource();
         StartLoadBranchTimer();
         StartLoadTopicTimer();
+        StartLoadImageTimer();
     }
 
     public void Stop()
@@ -75,6 +79,7 @@ public abstract class ProcessorBase
         _cancellationTokenSource.Cancel();
         StopLoadBranchTimer();
         StopLoadTopicTimer();
+        StopLoadImageTimer();
     }
 
     private void StopLoadTopicTimer()
@@ -115,6 +120,8 @@ public abstract class ProcessorBase
 
     public object LoadTopicPageLockObject => new object();
 
+    #region Branches
+
     private void StopLoadBranchTimer()
     {
         _branchLoadTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -148,6 +155,46 @@ public abstract class ProcessorBase
     }
 
     public object LoadBranchPageLockObject => new object();
+
+    #endregion
+
+    #region Images
+
+    private void StopLoadImageTimer()
+    {
+        _imageLoadTimer.Change(Timeout.Infinite, Timeout.Infinite);
+    }
+
+    private void StartLoadImageTimer()
+    {
+        _imageLoadTimer.Change(TimeSpan.FromMilliseconds(1000), TimeSpan.FromMilliseconds(1000));
+    }
+
+    private void LoadImageCallbackFunc(object state)
+    {
+        lock (LoadImageLockObject)
+        {
+            StopLoadImageTimer();
+            try
+            {
+                var task = LoadImageAsync();
+                task.Wait(Token);
+            }
+            finally
+            {
+                StartLoadImageTimer();
+            }
+        }
+    }
+
+    protected virtual Task LoadImageAsync()
+    {
+        throw new NotImplementedException();
+    }
+
+    public object LoadImageLockObject => new();
+
+    #endregion
 
     public SvcSettings SvcSettings { get; }
 
@@ -203,10 +250,37 @@ public abstract class ProcessorBase
 
         return responseString;
     }
+
+    protected async Task<bool> DownloadImageAsync(UrlInfo url, CancellationToken cancellationToken)
+    {
+        var imageFileName = FileCache.UrlToPath("Images", url.Url, "tiff");
+        if (File.Exists(imageFileName))
+        {
+            return true;
+        }
+
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(imageFileName));
+            var stream = await _client.GetStreamAsync(url.Url, cancellationToken);
+            var destStream = File.OpenWrite(imageFileName);
+            await stream.CopyToAsync(destStream, cancellationToken);
+            destStream.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return false;
+        }
+
+        return true;
+
+    }
 }
 
 public enum UrlKind
 {
     Branch,
     Topic,
+    Image,
 }

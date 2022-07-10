@@ -31,7 +31,7 @@ public enum CacheType
 
 public static class FileCache
 {
-    private static string UrlToPath(string folder, string url)
+    public static string UrlToPath(string folder, string url, string extension)
     {
         var cachePath = CoreSettings.Default.CacheDirectory;
         var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(url));
@@ -42,7 +42,7 @@ public static class FileCache
         var p3 = hashString.Substring(4, 2);
         var p4 = hashString.Substring(6, 2);
 
-        return Path.Combine(cachePath, p1, p2, p3, p4, $"{hashString}.html");
+        return Path.Combine(cachePath, folder, p1, p2, p3, p4, $"{hashString}.{extension}");
     }
 
     private static string IdToPath(string folder, int id, int start = 0)
@@ -95,7 +95,7 @@ public static class FileCache
     public static string TryGetBranchCache(string url)
     {
         return null;
-        var path = UrlToPath("branches", url);
+        var path = UrlToPath("branches", url, "html");
         if (File.Exists(path))
         {
             return File.ReadAllText(path);
@@ -121,7 +121,7 @@ public static class FileCache
 
     public static void PutBranchCache(string url, string content)
     {
-        var path = UrlToPath("branches", url);
+        var path = UrlToPath("branches", url, "html");
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         File.WriteAllText(path, content);
     }

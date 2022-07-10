@@ -39,14 +39,6 @@ public class OlxProcessor : ProcessorBase, IProcessor
             DatabaseName = "Olx_Classifieds",
         })
     {
-        var initialBranch = new BranchDto
-        {
-            Url = "https://olx.ua",
-            Title = "Main page",
-        };
-        //var task = Service.AddBranchIfNotExistsAsync(initialBranch, Token);
-        //task.Wait(Token);
-
         InitBranches().Wait();
     }
 
@@ -285,7 +277,6 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     protected override async Task LoadTopicPageAsync()
     {
-        //return Task.FromResult(0);
         var topic = await Service.GetWaitingTopicAsync(Token);
         if (topic == null)
         {
@@ -347,6 +338,24 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     public static void ExtractUserInfo(string content, UserDto user)
     {
+    }
+
+    protected override async Task LoadImageAsync()
+    {
+        var image = await Service.GetWaitingImageAsync(Token);
+        if (image == null)
+        {
+            return;
+        }
+
+        Console.WriteLine($"Processing image {image.Url}");
+
+        var urlInfo = new UrlInfo(image.Url);
+        var result = await DownloadImageAsync(urlInfo, Token);
+
+        image.LoadState = UrlLoadState.Loaded;
+        image.StatusCode = result ? UrlLoadStatusCode.Success : UrlLoadStatusCode.Failure;
+        await Service.AddOrUpdateImageAsync(image, Token);
     }
 }
 
