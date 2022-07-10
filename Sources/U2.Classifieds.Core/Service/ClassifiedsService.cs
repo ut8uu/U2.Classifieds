@@ -103,13 +103,16 @@ public sealed class ClassifiedsService
         return await _storage.TryGetTopicAsync(filter, cancellationToken);
     }
 
-    public async Task AddTopicIfNotExistsAsync(TopicDto topic, CancellationToken cancellationToken)
+    public async Task<bool> AddTopicIfNotExistsAsync(TopicDto topic, CancellationToken cancellationToken)
     {
         FixTopic(topic);
         if (!(await _storage.HasTopicWithOriginalIdAsync(topic.OriginalId, cancellationToken)))
         {
             await _storage.AddTopicAsync(topic, cancellationToken);
+            return true;
         }
+
+        return false;
     }
 
     public async Task AddOrUpdateTopicAsync(TopicDto topic, CancellationToken cancellationToken)

@@ -237,8 +237,10 @@ public class OlxProcessor : ProcessorBase, IProcessor
                     Title = topic.Title,
                     BranchId = branchId,
                 };
-                Console.WriteLine($"Added topic {topic.Url}");
-                await Service.AddTopicIfNotExistsAsync(topicDto, Token);
+                if (await Service.AddTopicIfNotExistsAsync(topicDto, Token))
+                {
+                    Console.WriteLine($"Added topic {topic.Url}");
+                }
             }
         }
     }
