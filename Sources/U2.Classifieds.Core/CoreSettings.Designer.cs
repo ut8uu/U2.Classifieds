@@ -25,7 +25,7 @@ namespace U2.Classifieds.Core {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("c:\\cache\\olx.ua")]
+        [global::System.Configuration.DefaultSettingValueAttribute("d:\\cache\\olx.ua")]
         public string CacheDirectory {
             get {
                 return ((string)(this["CacheDirectory"]));

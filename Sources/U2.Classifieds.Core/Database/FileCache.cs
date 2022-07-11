@@ -83,7 +83,7 @@ public static class FileCache
     public static string TryGetTopicCache(string url)
     {
         var id = UrlHelper.GetOriginalIdFromUrl(url);
-        var path = IdToPath("topics", id);
+        var path = UrlToPath("topics", id, "html");
         if (File.Exists(path))
         {
             return File.ReadAllText(path);
@@ -114,7 +114,7 @@ public static class FileCache
     public static void PutTopicCache(string url, string content)
     {
         var id = UrlHelper.GetOriginalIdFromUrl(url);
-        var path = IdToPath("topics", id);
+        var path = UrlToPath("topics", id, "html");
         Directory.CreateDirectory(Path.GetDirectoryName(path));
         File.WriteAllText(path, content);
     }

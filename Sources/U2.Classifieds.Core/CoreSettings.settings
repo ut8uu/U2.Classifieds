@@ -1,9 +1,9 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="U2.Classifieds.Core" GeneratedClassName="U2_Classifieds_Core">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="U2.Classifieds.Core" GeneratedClassName="CoreSettings">
   <Profiles />
   <Settings>
     <Setting Name="CacheDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">c:\cache\olx.ua</Value>
+      <Value Profile="(Default)">d:\cache\olx.ua</Value>
     </Setting>
   </Settings>
 </SettingsFile>
