@@ -21,10 +21,12 @@ public abstract class ProcessorBase
     private readonly int _numberOfRetriesOnFailure = 5;
     private readonly TimeSpan _delayBeforeRetryOnFailure = TimeSpan.FromSeconds(30);
     private readonly Encoding _win1251;
+    protected readonly Options _options;
     private CancellationTokenSource _cancellationTokenSource = new();
 
-    protected ProcessorBase(SvcSettings svcSettings)
+    protected ProcessorBase(Options options, SvcSettings svcSettings)
     {
+        this._options = options;
         SvcSettings = svcSettings;
         var db = CreateDatabase();
         var storage = new ClassifiedsStorage(db);
@@ -69,9 +71,21 @@ public abstract class ProcessorBase
     public void Start()
     {
         _cancellationTokenSource = new CancellationTokenSource();
-        StartLoadBranchTimer();
-        StartLoadTopicTimer();
-        StartLoadImageTimer();
+        if (_options.Branches) 
+        {
+            Console.WriteLine("Branch timer started.");
+            StartLoadBranchTimer();
+        }
+        if (_options.Topics)
+        {
+            Console.WriteLine("Topic timer started.");
+            StartLoadTopicTimer();
+        }
+        if (_options.Images)
+        {
+            Console.WriteLine("Image timer started.");
+            StartLoadImageTimer();
+        }
     }
 
     public void Stop()

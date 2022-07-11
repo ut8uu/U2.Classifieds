@@ -17,12 +17,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+using CommandLine;
+using MongoDB.Driver;
 using U2.Classifieds.Loader;
 
-var runner = new Runner();
-var ctx = new CancellationTokenSource();
+CommandLine.Parser.Default.ParseArguments<LoaderOptions>(args)
+    .WithParsed(RunOptions)
+    .WithNotParsed(HandleParseError);
 
-var task = Task.Run(() => runner.RunAsync(ctx.Token));
-task.Wait();
+static void RunOptions(LoaderOptions opts)
+{
+    if (!opts.Images && !opts.Topics && !opts.Branches)
+    {
+        Console.WriteLine("No flages is specified. Processing topics and images is used by default.");
+        opts.Topics = true;
+        opts.Images = true;
+    }
 
-ctx.Cancel();
+    var runner = new Runner(opts);
+    var ctx = new CancellationTokenSource();
+
+    var task = Task.Run(() => runner.RunAsync(ctx.Token));
+    task.Wait();
+
+    ctx.Cancel();
+}
+
+static void HandleParseError(IEnumerable<Error> errs)
+{
+    Console.WriteLine(string.Join("\r\n", errs.Select(x => x.Tag.ToString())));
+}

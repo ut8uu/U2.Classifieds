@@ -31,11 +31,18 @@ namespace U2.Classifieds.Loader;
 
 internal sealed class Runner
 {
-    private readonly IProcessor _processor = new OlxProcessor();
+    private readonly IProcessor _processor;
 
-    public Runner()
+    public Runner(LoaderOptions loaderOptions)
     {
-        
+        var options = new Options
+        {
+            Images = loaderOptions.Images,
+            Topics = loaderOptions.Topics,
+            Branches = loaderOptions.Branches,
+            InitBranches = loaderOptions.InitBranches,
+        };
+        _processor = new OlxProcessor(options);
     }
 
     public async Task RunAsync(CancellationToken token)

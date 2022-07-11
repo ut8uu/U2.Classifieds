@@ -32,14 +32,17 @@ namespace U2.Classifieds.Core;
 
 public class OlxProcessor : ProcessorBase, IProcessor
 {
-    public OlxProcessor()
-        : base(new SvcSettings
+    public OlxProcessor(Options options)
+        : base(options, new SvcSettings
         {
             ConnectionString = CoreSettings.Default.ConnectionString,
             DatabaseName = "Olx_Classifieds",
         })
     {
-        InitBranches().Wait();
+        if (options.InitBranches)
+        {
+            InitBranches().Wait();
+        }
     }
 
     private async Task InitBranches()
