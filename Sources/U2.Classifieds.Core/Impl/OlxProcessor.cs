@@ -35,7 +35,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
     public OlxProcessor()
         : base(new SvcSettings
         {
-            ConnectionString = "mongodb://localhost:27017",
+            ConnectionString = CoreSettings.Default.ConnectionString,
             DatabaseName = "Olx_Classifieds",
         })
     {

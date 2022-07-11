@@ -5,5 +5,8 @@
     <Setting Name="CacheDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">d:\cache\olx.ua</Value>
     </Setting>
+    <Setting Name="ConnectionString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mongodb://192.168.1.90:27017</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
