@@ -277,11 +277,14 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     protected override async Task LoadTopicPageAsync()
     {
-        var topic = await Service.GetWaitingTopicAsync(Token);
+        var topic = await Service.GetWaitingTopicAsync(Token, markAsLoading: true);
         if (topic == null)
         {
             return;
         }
+
+        topic.LoadState = UrlLoadState.Loading;
+        await Service.UpdateTopicAsync(topic, Token);
 
         Console.WriteLine($"Processing topic {topic.Url}");
 
@@ -342,7 +345,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
 
     protected override async Task LoadImageAsync()
     {
-        var image = await Service.GetWaitingImageAsync(Token);
+        var image = await Service.GetWaitingImageAsync(Token, markAsLoading: true);
         if (image == null)
         {
             return;

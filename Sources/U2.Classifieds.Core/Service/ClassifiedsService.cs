@@ -95,12 +95,20 @@ public sealed class ClassifiedsService
         }
     }
 
-    public async Task<TopicDto> GetWaitingTopicAsync(CancellationToken cancellationToken)
+    public async Task<TopicDto> GetWaitingTopicAsync(
+        CancellationToken cancellationToken, bool markAsLoading)
     {
         var filterBuilder = Builders<TopicDto>.Filter;
         var filter = filterBuilder.Eq(x => x.LoadState, UrlLoadState.Unknown);
 
-        return await _storage.TryGetTopicAsync(filter, cancellationToken);
+        var topic = await _storage.TryGetTopicAsync(filter, cancellationToken);
+        if (topic != null && markAsLoading)
+        {
+            topic.LoadState = UrlLoadState.Loading;
+            await _storage.UpdateTopicByIdAsync(topic, cancellationToken);
+        }
+
+        return topic;
     }
 
     public async Task<bool> AddTopicIfNotExistsAsync(TopicDto topic, CancellationToken cancellationToken)
@@ -158,12 +166,19 @@ public sealed class ClassifiedsService
 
     #region Users
 
-    public async Task<ImageDto> GetWaitingImageAsync(CancellationToken cancellationToken)
+    public async Task<ImageDto> GetWaitingImageAsync(CancellationToken cancellationToken, bool markAsLoading)
     {
         var filterBuilder = Builders<ImageDto>.Filter;
         var filter = filterBuilder.Eq(x => x.LoadState, UrlLoadState.Unknown);
 
-        return await _storage.TryGetImageAsync(filter, cancellationToken);
+        var image = await _storage.TryGetImageAsync(filter, cancellationToken);
+        if (image != null && markAsLoading)
+        {
+            image.LoadState = UrlLoadState.Loading;
+            await _storage.UpdateImageAsync(image, cancellationToken);
+        }
+
+        return image;
     }
 
     public async Task AddOrUpdateImageAsync(ImageDto image, CancellationToken cancellationToken)
