@@ -153,7 +153,13 @@ public sealed class ClassifiedsStorage : IStorage
 
     public async Task<TopicDto> TryGetTopicAsync(FilterDefinition<TopicDto> filter, CancellationToken cancellationToken)
     {
-        using var cursor = await _topicsCollection.FindAsync(filter, options: null, cancellationToken);
+        var sort = Builders<TopicDto>.Sort.Descending(x => x.AddTimestamp);
+        var findOptions = new FindOptions<TopicDto, TopicDto>()
+        {
+            Sort = sort
+        };
+        using var cursor = await _topicsCollection.FindAsync(filter, findOptions);
+
         var topic = cursor.FirstOrDefault();
         return FixTopic(topic);
     }

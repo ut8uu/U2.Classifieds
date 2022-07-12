@@ -38,5 +38,8 @@ public sealed class TopicDto
     public UrlLoadState LoadState { get; set; }
     public UrlLoadStatusCode LoadStatusCode { get; set; }
     public ParserStatusCode ParserStatusCode { get; set; }
+
+    public DateTime AddTimestamp { get; set; } = DateTime.UtcNow;
+    public DateTime LoadTimestamp { get; set; } = DateTime.MinValue;
 }
 

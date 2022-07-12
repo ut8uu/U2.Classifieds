@@ -295,6 +295,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
         var content = await DownloadAsync(urlInfo, UrlKind.Topic, Token);
         if (string.IsNullOrEmpty(content))
         {
+            topic.LoadTimestamp = DateTime.UtcNow;
             topic.LoadState = UrlLoadState.Loaded;
             topic.LoadStatusCode = UrlLoadStatusCode.Failure;
             topic.ParserStatusCode = ParserStatusCode.Unknown;
@@ -305,6 +306,7 @@ public class OlxProcessor : ProcessorBase, IProcessor
         //var classifiedsPage = await ParsePageAsync(content);
         //await StoreTopicsAsync(Guid.Empty, classifiedsPage.Topics, Token);
 
+        topic.LoadTimestamp = DateTime.UtcNow;
         topic.LoadState = UrlLoadState.Loaded;
         topic.LoadStatusCode = UrlLoadStatusCode.Success;
         ParseTopicPage(content, topic);
