@@ -22,10 +22,10 @@ using MongoDB.Driver;
 using U2.Classifieds.Loader;
 
 CommandLine.Parser.Default.ParseArguments<LoaderOptions>(args)
-    .WithParsed(RunOptions)
+    .WithParsed(RunLoaderWithOptions)
     .WithNotParsed(HandleParseError);
 
-static void RunOptions(LoaderOptions opts)
+static void RunLoaderWithOptions(LoaderOptions opts)
 {
     if (!opts.Images && !opts.Topics && !opts.Branches)
     {
